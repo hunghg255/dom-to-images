@@ -32,7 +32,7 @@ export interface Options {
 ## Browser Support
 
 ```html
-<script src="https://unpkg.com/dom-to-images/dist/index.js"></script>
+<script type="module" src="https://unpkg.com/dom-to-images/dist/index.mjs"></script>
 
 <script>
   DomToImage.toPng(document.body).then(function (dataUrl) {

@@ -1,8 +1,4 @@
-import {
-  toPng as _toPng,
-  toJpeg as _toJpeg,
-  toBlob as _toBlob,
-} from "dom-to-image-chrome-fix-retina"
+import html2canvas from 'html2canvas';
 import { changeDpiDataUrl, changeDpiBlob } from "changedpi"
 
 export interface Options {
@@ -19,19 +15,27 @@ export interface Options {
 const DPI = 72 * 2
 
 export const toPng = (el: Node, options?: Options): Promise<string> => {
-  return _toPng(el, options).then((dataUrl: string) =>
-    changeDpiDataUrl(dataUrl, DPI)
-  )
+  return html2canvas(el as any, options).then((canvas) =>{
+    return changeDpiDataUrl(canvas.toDataURL("image/png", 0.92), DPI); ;
+  });
 }
 
 export const toJpeg = (el: Node, options?: Options): Promise<string> => {
-  return _toJpeg(el, options).then((dataUrl: string) =>
-    changeDpiDataUrl(dataUrl, DPI)
-  )
+  return html2canvas(el as any, options).then((canvas) =>{
+    return changeDpiDataUrl(canvas.toDataURL("image/jpeg", 0.92), DPI); ;
+  });
 }
 
 export const toBlob = (el: Node, options?: Options): Promise<Blob> => {
-  return _toBlob(el, options).then((blob: Blob) => changeDpiBlob(blob, DPI))
+  return new Promise((resolve, reject) => {
+    html2canvas(el as any, options).then((canvas) =>{
+      return canvas.toBlob(function(blob) {
+        changeDpiBlob(blob, DPI).then(function(blob: any){
+          resolve(blob);
+        })
+      },'image/jpeg', 0.92);
+    })
+  });
 }
 
 if (typeof window !== "undefined") {
@@ -39,6 +43,6 @@ if (typeof window !== "undefined") {
   window.DomToImage = {
     toPng,
     toJpeg,
-    toBlob,
+    toBlob
   }
 }
